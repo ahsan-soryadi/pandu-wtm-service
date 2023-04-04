@@ -1,0 +1,15 @@
+{
+  "name": "pandu-wtm-service",
+  "version": "1.0.0",
+  "description": "backend service for pandu wtm app",
+  "main": "index.js",
+  "scripts": {
+    "start" : "nodemon index.js"
+  },
+  "author": "ahsan soryadi",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22"
+  }
+}
