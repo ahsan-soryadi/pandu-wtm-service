@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
@@ -8,7 +9,8 @@ const cookieParser = require('cookie-parser');
 const mysql = require('mysql');
 const { cookie } = require('express/lib/response');
 const dbUtils = require('./dbUtils');
-const { generateAccessToken, generateRefreshToken } = require('./token');
+const {generateAccessToken} = require('./token')
+
 
 let isLogin = false;
 
@@ -58,8 +60,9 @@ router.post("/login", async (req, res)=> {
    // } else {
       if(await dbUtils.comparePassword(userName, password)){
         const token = generateAccessToken(userName)
-        const refreshToken = generateRefreshToken(userName)
-        res.send({"message":"ok", "token":token, "refresh": refreshToken})
+        //const refreshToken = generateRefreshToken(userName)
+        // res.cookie("token",token,{httpOnly: true})
+        res.send({"message":"ok", "token":token})
       } else {
         res.send({"error": "username or password did not match"})
       }
