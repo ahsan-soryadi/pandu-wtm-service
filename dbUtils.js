@@ -25,7 +25,7 @@ exports.findUser = async (userName) => {
     let result = {}
     const conn = await this.conn()
     try {
-        const [rows] = await conn.execute("SELECT * FROM USERNAME WHERE USERNAME = ?",[userName])
+        const [rows] = await conn.execute("SELECT USERNAME, ROLE FROM USERNAME WHERE USERNAME = ?",[userName])
         result = {}
         // console.log("rows ",rows)
         if(rows.length > 0){
@@ -47,21 +47,20 @@ exports.comparePassword = async (userName, password) => {
     let result = false
     const conn = await this.conn()
     try {
-        const [rows] = await conn.execute("SELECT USERNAME, PASSWORD FROM USERNAME WHERE PASSWORD = ?", [password])
-        result = false
+        const [rows] = await conn.execute("SELECT USERNAME, PASSWORD FROM USERNAME WHERE USERNAME = ?", [userName])
+        // result = false
         if(rows.length > 0){
-            rows.forEach(data => {
-                if(data.USERNAME.toLowerCase() === userName.toLowerCase() && data.PASSWORD === password){
-                    console.log("inside password match")
-                    result = true
-                    // if(await bcrypt.compare(password, row.PASSWORD)) return true;
+            for (const data of rows){
+                if(data.USERNAME.toLowerCase() === userName.toLowerCase()){
+                    result = await bcrypt.compare(password, data.PASSWORD)
                 }
-            })
+            }
         }
         
     } catch (error) {
         console.log(error)
         result = false
+        
     } finally {
         await conn.end()
     }

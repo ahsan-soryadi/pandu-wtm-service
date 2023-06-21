@@ -25,13 +25,15 @@ router.get("/test",async (req, res) => {
 router.get("/encrypt", (req, res) => {
     try {
         bcrypt.genSalt(10).then(result => {
-            bcrypt.hash('cancerjune06', result).then(hashResult => {
+            bcrypt.hash('12345678', result).then(hashResult => {
                 console.log(hashResult);
+                res.send({"message":"ok", "hashed password": hashResult})
+                return
             })
             .catch(error => console.log(error))
         })
         .catch(error => console.log(error))
-        res.send({"message":"ok"})
+        
     } catch (error) {
         console.log(error)
         res.send(error)
@@ -48,7 +50,6 @@ router.post("/login", async (req, res)=> {
         return
     }
     const user = await dbUtils.findUser(userName);
-    console.log(user)
     if(Object.keys(user).length <= 0){
         console.log("inside user not found")
         res.send({"error":"username not found"})
@@ -60,11 +61,9 @@ router.post("/login", async (req, res)=> {
    // } else {
       if(await dbUtils.comparePassword(userName, password)){
         const token = generateAccessToken(userName)
-        //const refreshToken = generateRefreshToken(userName)
-        // res.cookie("token",token,{httpOnly: true})
-        res.send({"message":"ok", "token":token})
+        res.send({"message":"ok", "token":token, "user":user})
       } else {
-        res.send({"error": "username or password did not match"})
+        res.send({"error": "username or password did not match", "password": password})
       }
     //}
                 // db.query("SELECT USERNAME, PASSWORD FROM USER WHERE USERNAME = ?", 
@@ -93,14 +92,14 @@ router.post("/login", async (req, res)=> {
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    console.log(authHeader);
+    // console.log(authHeader);
     const token = authHeader.split('=')[1];
-    console.log("token=", token)
+    // console.log("token=", token)
     if(token == null || token === undefined) {
         isLogin = false;
     } else {
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-            console.log("error = ", err)
+            // console.log("error = ", err)
             if(err){
                 isLogin = false;
             } else {
@@ -113,7 +112,7 @@ const authenticateToken = (req, res, next) => {
 }
 
 router.get('/auth', authenticateToken, (req, res) => {   
-    console.log("result = ", isLogin) 
+    // console.log("result = ", isLogin) 
     res.json({"result": isLogin});
 })
 
