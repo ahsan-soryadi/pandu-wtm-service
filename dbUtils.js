@@ -25,7 +25,7 @@ exports.findUser = async (userName) => {
     let result = {}
     const conn = await this.conn()
     try {
-        const [rows] = await conn.execute("SELECT USERNAME, ROLE FROM USERNAME WHERE USERNAME = ?",[userName])
+        const [rows] = await conn.execute("SELECT USERNAME, ROLE, ID FROM USERNAME WHERE USERNAME = ?",[userName])
         result = {}
         // console.log("rows ",rows)
         if(rows.length > 0){
