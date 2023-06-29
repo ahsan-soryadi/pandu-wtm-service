@@ -27,13 +27,11 @@ exports.findUser = async (userName) => {
     try {
         const [rows] = await conn.execute("SELECT USERNAME, ROLE, ID FROM USERNAME WHERE USERNAME = ?",[userName])
         result = {}
-        // console.log("rows ",rows)
         if(rows.length > 0){
             rows.map(data => {
                 result = data
             })
         }
-        // console.log("result ",result)
         return result;
     } catch (error) {
         console.log(error)
@@ -48,7 +46,6 @@ exports.comparePassword = async (userName, password) => {
     const conn = await this.conn()
     try {
         const [rows] = await conn.execute("SELECT USERNAME, PASSWORD FROM USERNAME WHERE USERNAME = ?", [userName])
-        // result = false
         if(rows.length > 0){
             for (const data of rows){
                 if(data.USERNAME.toLowerCase() === userName.toLowerCase()){

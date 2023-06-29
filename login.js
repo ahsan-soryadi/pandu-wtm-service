@@ -16,12 +16,14 @@ let isLogin = false;
 
 router.use(cookieParser());
 
+//test DB connection
 router.get("/test",async (req, res) => {
     const dbResult = await dbUtils.findUser("Pandu Wibisana");
     console.log("db result : ",dbResult)
     res.send({"result":dbResult})
 })
 
+//encrypt password manual
 router.get("/encrypt", (req, res) => {
     try {
         bcrypt.genSalt(10).then(result => {
@@ -40,6 +42,7 @@ router.get("/encrypt", (req, res) => {
     }
 })
 
+//login end point
 router.post("/login", async (req, res)=> {
     const userName = req.body.userName  ? req.body.userName : "";
     const password = req.body.password  ? req.body.password : "";
@@ -49,57 +52,33 @@ router.post("/login", async (req, res)=> {
         res.send({"error": "username and password cannot empty"})
         return
     }
+    //check if user exist
     const user = await dbUtils.findUser(userName);
     if(Object.keys(user).length <= 0){
         console.log("inside user not found")
         res.send({"error":"username not found"})
         return
-        //isUserExist = true;
     }
-    //if(!isUserExist){
-        
-   // } else {
+    //end
+
+    //check if password correct
       if(await dbUtils.comparePassword(userName, password)){
         const token = generateAccessToken(userName)
         res.send({"message":"ok", "token":token, "user":user})
       } else {
         res.send({"error": "username or password did not match", "password": password})
       }
-    //}
-                // db.query("SELECT USERNAME, PASSWORD FROM USER WHERE USERNAME = ?", 
-                // [userName], 
-                //  async (err, result) => {
-                //     if(result.length > 0){
-                //         //need further check for multiple rows of result
-                //         for(let i=0; i<result.length; i++){
-                //             if(userName === result[i].USERNAME){
-                //                 if(await bcrypt.compare(password, result[i].PASSWORD)){
-                //                     console.log('password sama')
-                //                     const token = jwt.sign({"user":result[i].USERNAME}, process.env.ACCESS_TOKEN_SECRET,{expiresIn:60})
-                //                     res.send({"message":"ok", "token":token})
-                //                 }else{
-                //                     console.log('password salah')
-                //                     res.send({"message":"error, password did not match"})
-                //                 }
-                //             }
-                //         }
-                //     } else {
-                //         res.send({"error":"username not found"})
-                //     }
-                // })
-
+    //end
 })
 
+//authenticate token send from frontend process
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    // console.log(authHeader);
     const token = authHeader.split('=')[1];
-    // console.log("token=", token)
     if(token == null || token === undefined) {
         isLogin = false;
     } else {
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-            // console.log("error = ", err)
             if(err){
                 isLogin = false;
             } else {
@@ -111,11 +90,12 @@ const authenticateToken = (req, res, next) => {
     next();  
 }
 
-router.get('/auth', authenticateToken, (req, res) => {   
-    // console.log("result = ", isLogin) 
+//authenticate token end point
+router.get('/auth', authenticateToken, (req, res) => {    
     res.json({"result": isLogin});
 })
 
+//logout end point
 router.get('/logout', (req, res) => {
     console.log()
     res.cookie({'token': 'none'}, {
