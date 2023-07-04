@@ -12,3 +12,21 @@ exports.getPeruntukanID = async (peruntukan = '') => {
         await dbConn.end()
     }
 }
+
+exports.editPeruntukan = async (barang) => {
+    console.log('barang ', barang)
+    if(barang.length == 0){
+        return "parameter tidak lengkap"
+    }
+    const dbConn = await conn()
+    const sqlString = 'INSERT INTO EDIT_PERUNTUKAN(BARANGID, KETERANGAN_ALASAN_DIGANTI, PERUNTUKANID, PERUNTUKAN_BARU) VALUES (?,?,?,?)'
+    try {
+        const [rows] = await dbConn.query(sqlString, [barang.ID, barang.alasan, barang.PERUNTUKANID, barang.peruntukanBaru])
+        return rows
+              
+    } catch (error) {
+        console.log(error)
+    } finally {
+        await dbConn.end()
+    }
+}

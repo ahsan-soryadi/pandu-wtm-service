@@ -52,7 +52,7 @@ router.post("/login", async (req, res)=> {
         res.send({"error": "username and password cannot empty"})
         return
     }
-    //check if user exist
+    //check if user exist and get user data
     const user = await dbUtils.findUser(userName);
     if(Object.keys(user).length <= 0){
         console.log("inside user not found")

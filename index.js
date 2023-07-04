@@ -1,7 +1,9 @@
-const express = require('express');
-const cors = require('cors');
-const login = require('./login');
-const stock = require('./stock');
+const express = require('express')
+const cors = require('cors')
+const login = require('./login')
+const stock = require('./stock')
+const barang = require('./barang')
+const stockOpname = require('./stockOpname')
 const app = express();
 app.use(express.json());
 
@@ -11,8 +13,10 @@ app.use(cors({
     credentials: true
 }))
 
-app.use('/user', login);
+app.use('/user', login)
 app.use('/stock', stock)
+app.use('/barang', barang)
+app.use('/stockOpname', stockOpname)
 app.get("/", (req, res) => {
     res.send("test saja")
 });

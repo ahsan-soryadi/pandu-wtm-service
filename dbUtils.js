@@ -20,12 +20,12 @@ exports.conn = async() => {
     return pool.promise();
 }
 
-exports.findUser = async (userName) => {
+exports. findUser = async (userName) => {
     if(userName === undefined || null) return {};
     let result = {}
     const conn = await this.conn()
     try {
-        const [rows] = await conn.execute("SELECT USERNAME, ROLE, ID FROM USERNAME WHERE USERNAME = ?",[userName])
+        const [rows] = await conn.execute("SELECT USERNAME, ROLE, ID, LOKASI_GUDANGID, (SELECT NAMA_GUDANG FROM LOKASI_GUDANG WHERE LOKASI_GUDANG.ID = USERNAME.LOKASI_GUDANGID) AS LOKASIGUDANG FROM USERNAME WHERE USERNAME = ?",[userName])
         result = {}
         if(rows.length > 0){
             rows.map(data => {
