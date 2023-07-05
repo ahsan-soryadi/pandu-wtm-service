@@ -4,6 +4,9 @@ const login = require('./login')
 const stock = require('./stock')
 const barang = require('./barang')
 const stockOpname = require('./stockOpname')
+const gudang = require('./gudang')
+const pengirimanAg = require('./pengirimanAg')
+
 const app = express();
 app.use(express.json());
 
@@ -17,6 +20,8 @@ app.use('/user', login)
 app.use('/stock', stock)
 app.use('/barang', barang)
 app.use('/stockOpname', stockOpname)
+app.use('/gudang', gudang)
+app.use('/tag', pengirimanAg)
 app.get("/", (req, res) => {
     res.send("test saja")
 });
