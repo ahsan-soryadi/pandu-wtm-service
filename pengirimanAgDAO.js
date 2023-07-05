@@ -40,3 +40,92 @@ exports.addPengirimanAg = async (tagEntries = {}) =>{
         await dbConn.end()
     }
 }
+
+exports.getAllPengirimanAg = async (locationId = 0) =>{
+    if(locationId === 0){
+        return []
+    }
+    const dbConn = await conn()
+    const sqlString = `SELECT id, 
+                        (SELECT username FROM username where username.id = pengiriman_ag.usernameID) as username,
+                        (SELECT nama_gudang FROM lokasi_gudang WHERE lokasi_gudang.id = pengiriman_ag.lokasi_gudang_pengirimID) as gudangPengirim,
+                        (SELECT nama_gudang FROM lokasi_gudang WHERE lokasi_gudang.id = pengiriman_ag.lokasi_gudang_penerimaID) as gudangPenerima,
+                        tgl_pengiriman as tanggalPengiriman, 
+                        pilih_pengiriman as jenisPengiriman,
+                        jasa_pengiriman as jasaPengiriman,
+                        Qty as qty,
+                        no_resi FROM pengiriman_ag WHERE lokasi_gudang_pengirimID = ?`
+    try {
+        const [rows] = await dbConn.query(sqlString, [locationId])
+        return rows
+    } catch (error) {
+        console.log(error)
+    } finally {
+        await dbConn.end()
+    }
+}
+
+exports.getAllPenerimaanAg = async (locationId = 0) =>{
+    if(locationId === 0){
+        return []
+    }
+    const dbConn = await conn()
+    const sqlString = `SELECT id, 
+                        (SELECT username FROM username where username.id = pengiriman_ag.usernameID) as username,
+                        (SELECT nama_gudang FROM lokasi_gudang WHERE lokasi_gudang.id = pengiriman_ag.lokasi_gudang_pengirimID) as gudangPengirim,
+                        (SELECT nama_gudang FROM lokasi_gudang WHERE lokasi_gudang.id = pengiriman_ag.lokasi_gudang_penerimaID) as gudangPenerima,
+                        tgl_pengiriman as tanggalPengiriman, 
+                        pilih_pengiriman as jenisPengiriman,
+                        jasa_pengiriman as jasaPengiriman,
+                        no_resi FROM pengiriman_ag WHERE lokasi_gudang_penerimaID = ?`
+    try {
+        const [rows] = await dbConn.query(sqlString, [locationId])
+        return rows
+    } catch (error) {
+        console.log(error)
+    } finally {
+        await dbConn.end()
+    }
+}
+
+exports.getPengirimanAgById = async (pengirimanAgId = 0) => {
+    if(pengirimanAgId === 0){
+        return []
+    }
+    const dbConn = await conn()
+    const sqlString = `SELECT id, 
+                        (SELECT username FROM username where username.id = pengiriman_ag.usernameID) as username,
+                        (SELECT nama_gudang FROM lokasi_gudang WHERE lokasi_gudang.id = pengiriman_ag.lokasi_gudang_pengirimID) as gudangPengirim,
+                        (SELECT nama_gudang FROM lokasi_gudang WHERE lokasi_gudang.id = pengiriman_ag.lokasi_gudang_penerimaID) as gudangPenerima,
+                        tgl_pengiriman as tanggalPengiriman, 
+                        pilih_pengiriman as jenisPengiriman,
+                        jasa_pengiriman as jasaPengiriman,
+                        no_resi FROM pengiriman_ag WHERE id = ?`
+    try {
+        const [rows] = await dbConn.query(sqlString, [pengirimanAgId])
+        return rows
+    } catch (error) {
+        console.log(error)
+    } finally {
+        await dbConn.end()
+    }
+}
+
+exports.getDetailPengirimanAgById = async (pengirimanAgId = 0) => {
+    if(pengirimanAgId === 0){
+        return []
+    }
+    const dbConn = await conn()
+    const sqlString = `SELECT serialNumber, 
+                        (SELECT produk_seri FROM barang WHERE barang.serialNumber = pengiriman_ag_details.serialNumber) AS produkSeri,
+                        (SELECT jenis_barang FROM barang WHERE barang.serialNumber = pengiriman_ag_details.serialNumber) AS jenisBarang,
+                        tanggal_diterima as tanggalDiterima FROM pengiriman_ag_details WHERE pengiriman_agID = ?`
+    try {
+        const [rows] = await dbConn.query(sqlString, [pengirimanAgId])
+        return rows
+    } catch (error) {
+        console.log(error)
+    } finally {
+        await dbConn.end()
+    }
+}
