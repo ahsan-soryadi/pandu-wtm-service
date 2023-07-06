@@ -77,7 +77,9 @@ exports.getAllPenerimaanAg = async (locationId = 0) =>{
                         tgl_pengiriman as tanggalPengiriman, 
                         pilih_pengiriman as jenisPengiriman,
                         jasa_pengiriman as jasaPengiriman,
-                        no_resi FROM pengiriman_ag WHERE lokasi_gudang_penerimaID = ?`
+                        no_resi, 
+                        tanggal_penerimaan as tanggalPenerimaan 
+                        FROM pengiriman_ag WHERE lokasi_gudang_penerimaID = ?`
     try {
         const [rows] = await dbConn.query(sqlString, [locationId])
         return rows
@@ -100,7 +102,7 @@ exports.getPengirimanAgById = async (pengirimanAgId = 0) => {
                         tgl_pengiriman as tanggalPengiriman, 
                         pilih_pengiriman as jenisPengiriman,
                         jasa_pengiriman as jasaPengiriman,
-                        no_resi FROM pengiriman_ag WHERE id = ?`
+                        no_resi, Qty, nomor_telepon FROM pengiriman_ag WHERE id = ?`
     try {
         const [rows] = await dbConn.query(sqlString, [pengirimanAgId])
         return rows
@@ -129,3 +131,27 @@ exports.getDetailPengirimanAgById = async (pengirimanAgId = 0) => {
         await dbConn.end()
     }
 }
+
+exports.addPenerimaanAg = async (tagEntries = {}) => {
+    if(Object.keys(tagEntries).length === 0){
+        return {"message": "error"}
+    }
+
+    const dbConn = await conn()
+    const sqlString = 'UPDATE pengiriman_ag SET tanggal_penerimaan = ? WHERE id = ?'
+    const sqlString2 = 'UPDATE pengiriman_ag_details SET tanggal_penerimaan = ? WHERE pengiriman_agID = ?'
+    try {
+        const [insertResult] = await dbConn.query(sqlString, [tagEntries.tangaalPenerimaan, tagEntries.pengirimanAgId])
+        if(insertResult.insertId !== 0){
+            const [rows] = await dbConn.query(sqlString2, [tagEntries.tangaalPenerimaan, tagEntries.pengirimanAgId])
+            return rows
+        } else {
+            return {"message": "error"}
+        }
+    } catch (error) {
+        console.log(error)
+    } finally {
+        await dbConn.end()
+    }
+}
+    
