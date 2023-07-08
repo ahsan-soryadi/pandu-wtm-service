@@ -20,7 +20,7 @@ exports.addPengirimanAg = async (tagEntries = {}) =>{
                                                             parseInt(tagEntries.lokasiGudangId),
                                                             tagEntries.tanggalPengiriman,
                                                             tagEntries.jenisPengiriman,
-                                                            tagEntries.jasEkspedisi !== '' ? tagEntries.jasEkspedisi : null,
+                                                            tagEntries.jasaPengiriman !== '' ? tagEntries.jasaPengiriman : null,
                                                             tagEntries.noResi,
                                                             parseInt(tagEntries.qty),
                                                             parseInt(tagEntries.gudangPenerima),
@@ -121,7 +121,7 @@ exports.getDetailPengirimanAgById = async (pengirimanAgId = 0) => {
     const sqlString = `SELECT serialNumber, 
                         (SELECT produk_seri FROM barang WHERE barang.serialNumber = pengiriman_ag_details.serialNumber) AS produkSeri,
                         (SELECT jenis_barang FROM barang WHERE barang.serialNumber = pengiriman_ag_details.serialNumber) AS jenisBarang,
-                        tanggal_diterima as tanggalDiterima FROM pengiriman_ag_details WHERE pengiriman_agID = ?`
+                        tanggal_penerimaan as tanggalDiterima FROM pengiriman_ag_details WHERE pengiriman_agID = ?`
     try {
         const [rows] = await dbConn.query(sqlString, [pengirimanAgId])
         return rows
@@ -133,6 +133,7 @@ exports.getDetailPengirimanAgById = async (pengirimanAgId = 0) => {
 }
 
 exports.addPenerimaanAg = async (tagEntries = {}) => {
+    console.log(tagEntries)
     if(Object.keys(tagEntries).length === 0){
         return {"message": "error"}
     }
@@ -140,11 +141,23 @@ exports.addPenerimaanAg = async (tagEntries = {}) => {
     const dbConn = await conn()
     const sqlString = 'UPDATE pengiriman_ag SET tanggal_penerimaan = ? WHERE id = ?'
     const sqlString2 = 'UPDATE pengiriman_ag_details SET tanggal_penerimaan = ? WHERE pengiriman_agID = ?'
+    const sqlString3 = 'UPDATE barang SET lokasi_gudangID = (SELECT id FROM lokasi_gudang WHERE nama_gudang = ?) WHERE serialNumber = ?'
+    let resultUpdate = []
     try {
-        const [insertResult] = await dbConn.query(sqlString, [tagEntries.tangaalPenerimaan, tagEntries.pengirimanAgId])
-        if(insertResult.insertId !== 0){
-            const [rows] = await dbConn.query(sqlString2, [tagEntries.tangaalPenerimaan, tagEntries.pengirimanAgId])
-            return rows
+        const [insertResult] = await dbConn.query(sqlString, [tagEntries.tanggalPenerimaan, tagEntries.pengirimanAgId])
+        console.log("insert result = ", insertResult)
+        if(insertResult.affectedRows > 0){
+            const [rows] = await dbConn.query(sqlString2, [tagEntries.tanggalPenerimaan, tagEntries.pengirimanAgId])
+            console.log("rows = ", rows)
+            if(rows.affectedRows > 0){
+                
+                for(let i = 0; i <rows.affectedRows; i++){
+                    const [updateBarangLocation] = await dbConn.query(sqlString3, [tagEntries.gudangPenerima, tagEntries.serialNumber[i]])
+                    console.log(updateBarangLocation)
+                    resultUpdate.push(updateBarangLocation.affectedRows)
+                }
+                return resultUpdate
+            }
         } else {
             return {"message": "error"}
         }

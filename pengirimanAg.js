@@ -38,11 +38,13 @@ router.post('/getDetailPengirimanAgById', async (req, res) => {
 
 router.post('/addPenerimaanAg', async (req, res) => {
     const result = await addPenerimaanAg(req.body)
-    if(result.affectedRows > 0){
-        res.send({"message": "ok"})
-    } else if(result.message.error){
+    console.log(result)
+    
+    if(result.message === 'error'){
         res.send({"message": "error"})
-    }
+    } else if(result.every(item => item > 0)) {
+        res.send({"message": "ok"})
+    } 
 })
 
 module.exports = router
