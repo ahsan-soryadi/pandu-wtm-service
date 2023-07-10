@@ -145,15 +145,15 @@ exports.addPenerimaanAg = async (tagEntries = {}) => {
     let resultUpdate = []
     try {
         const [insertResult] = await dbConn.query(sqlString, [tagEntries.tanggalPenerimaan, tagEntries.pengirimanAgId])
-        console.log("insert result = ", insertResult)
+        // console.log("insert result = ", insertResult)
         if(insertResult.affectedRows > 0){
             const [rows] = await dbConn.query(sqlString2, [tagEntries.tanggalPenerimaan, tagEntries.pengirimanAgId])
-            console.log("rows = ", rows)
+            // console.log("rows = ", rows)
             if(rows.affectedRows > 0){
                 
                 for(let i = 0; i <rows.affectedRows; i++){
                     const [updateBarangLocation] = await dbConn.query(sqlString3, [tagEntries.gudangPenerima, tagEntries.serialNumber[i]])
-                    console.log(updateBarangLocation)
+                    // console.log(updateBarangLocation)
                     resultUpdate.push(updateBarangLocation.affectedRows)
                 }
                 return resultUpdate
